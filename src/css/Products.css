@@ -1,0 +1,109 @@
+.products {
+  /* display: flex; */
+  height: 100%;
+  width: 100%;
+  padding-top: 5%;
+  /* margin: 2rem 0rem 4rem 2rem; */
+}
+
+.no_data {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 5%;
+  font-size: 1.6rem;
+  justify-content: center;
+}
+
+.products .product_section:last-of-type {
+  padding-bottom: 10rem;
+}
+
+.products_wrapper {
+  display: flex;
+  gap: 4rem;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-y: hidden;
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+.products_wrapper::-webkit-scrollbar {
+  display: none;
+}
+.category_name {
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+/*  Product     */
+.product {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  color: var(--text-color);
+  width: 17%;
+  min-width: 17%;
+  height: 30rem;
+  background-size: 100% 100%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 1rem;
+  position: relative;
+  z-index: 2;
+}
+.product::-webkit-scrollbar {
+  display: none;
+}
+.products_container {
+  margin-block: 10rem 7rem;
+}
+.product_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), 70%, rgba(0, 0, 0, 95%));
+}
+.product_data {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 2rem 2rem;
+  position: absolute;
+  z-index: 3;
+}
+
+.product_data .product_name {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.product_data .product_description {
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--white);
+}
+
+.product_data .product_price {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--text-yellow);
+}
+
+@media screen and (max-width: 500px) {
+  .products_container {
+    margin-block: 4rem 7rem;
+  }
+}
