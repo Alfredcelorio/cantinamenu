@@ -18,7 +18,10 @@ function ProductMobile({ products, setOpenDetail, setSelectedProduct, media }) {
 
   const handleSelectProduct = (id) => {
     const obj = {
-      products: products?.products,
+      products: products?.products?.map((item) => ({
+        ...item,
+        categoryName: products?.categoryName,
+      })),
       selectedId: id,
     };
     setSelectedProduct(obj);

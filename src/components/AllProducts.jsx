@@ -2,9 +2,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect } from 'react';
-import ProductSection1 from './ProductSection1';
 import ProductSection2 from './ProductSection2';
-import ProductSection3 from './ProductSection3';
 // import Product from './Product';
 // import HeaderImage from '../assets/images/header.jpg';
 // import Wine3 from '../assets/images/products/wine3.jpg';
@@ -55,10 +53,6 @@ function AllProducts({
     setMobileView(media);
   }, [media]);
 
-  let firstSecion = 0;
-  let secondSection = 1;
-  let thirdSection = 2;
-
   return (
     <div className="products">
       {/* <div className="products_container">
@@ -83,45 +77,15 @@ function AllProducts({
             />
           ))
         ) : (
-          products?.map((item, ind) => {
-            const index = ind;
-            if (firstSecion === index) {
-              firstSecion += 3;
-              return (
-                <ProductSection2
-                  section={2}
-                  setOpenDetail={setOpenDetail}
-                  setSelectedProduct={setSelectedProduct}
-                  key={products?.title}
-                  products={item}
-                />
-              );
-            }
-            if (secondSection === index) {
-              secondSection += 3;
-              return (
-                <ProductSection1
-                  section={1}
-                  setOpenDetail={setOpenDetail}
-                  setSelectedProduct={setSelectedProduct}
-                  key={products?.title}
-                  products={item}
-                />
-              );
-            }
-            if (thirdSection === index) {
-              thirdSection += 3;
-              return (
-                <ProductSection3
-                  section={3}
-                  setOpenDetail={setOpenDetail}
-                  setSelectedProduct={setSelectedProduct}
-                  key={products?.title}
-                  products={item}
-                />
-              );
-            }
-          })
+          products?.map((item, ind) => (
+            <ProductSection2
+              section={2}
+              setOpenDetail={setOpenDetail}
+              setSelectedProduct={setSelectedProduct}
+              key={item?.categoryName || ind}
+              products={item}
+            />
+          ))
         )
       }
     </div>

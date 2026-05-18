@@ -9,7 +9,6 @@ import { Helmet } from 'react-helmet';
 import AllProducts from '../components/AllProducts';
 import Header from '../components/Header';
 import MenuList from '../components/MenuList';
-import Spinner from '../components/Spinner';
 import ProductPreview from './ProductPreview';
 
 import {
@@ -37,7 +36,7 @@ function Menu() {
   const [stopScroll, setStopScroll] = useState(false);
   const [openList, setOpenList] = useState(true);
   const [openDetail, setOpenDetail] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const setLoading = () => {};
   const [loadData, setLoadData] = useState(false);
 
   const navigate = useNavigate();
@@ -74,7 +73,13 @@ function Menu() {
         const findProduct = prods?.products?.find((item) => item?.id === productId);
         if (findProduct) {
           prod = findProduct?.id;
-          setSelectedProduct({ selectedId: findProduct?.id, products: prods?.products });
+          setSelectedProduct({
+            selectedId: findProduct?.id,
+            products: prods?.products?.map((item) => ({
+              ...item,
+              categoryName: prods?.categoryName,
+            })),
+          });
           setOpenList(false);
         }
       });
@@ -125,9 +130,6 @@ function Menu() {
         <title>{restaurant?.restaurantName}</title>
         <meta name="description" content={restaurant?.description} />
       </Helmet>
-      {(!loadData || loading) && (
-        <Spinner loadData={loadData} setLoading={setLoading} setLoadData={setLoadData} timer={14} />
-      )}
       {restaurant?.id ? (
         <>
           <Header

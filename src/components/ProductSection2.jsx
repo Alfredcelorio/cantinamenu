@@ -19,7 +19,10 @@ function ProductSection2({ products, setOpenDetail, setSelectedProduct, section 
 
   const handleSelectProduct = (id) => {
     const obj = {
-      products: products?.products,
+      products: products?.products?.map((item) => ({
+        ...item,
+        categoryName: products?.categoryName,
+      })),
       selectedId: id,
     };
     navigate(`?productId=${id}`);

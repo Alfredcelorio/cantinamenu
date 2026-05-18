@@ -8,11 +8,17 @@
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore/lite';
 import { db } from './firebase';
 
+const sortProductsByPosition = (products = []) => [...products].sort(
+    (a, b) => (a?.position ?? Number.MAX_SAFE_INTEGER) - (b?.position ?? Number.MAX_SAFE_INTEGER),
+  );
+
 // Categorized all Products by their category
 export const getCategorizedProducts = async (productCategories, allProducts) => {
   const finalData = [];
   productCategories.forEach((prod) => {
-    const dataByCategory = allProducts?.filter((item) => item.categoryId === prod);
+    const dataByCategory = sortProductsByPosition(
+      allProducts?.filter((item) => item.categoryId === prod),
+    );
     const dataObj = {
       categoryId: prod,
       products: dataByCategory,
@@ -25,10 +31,17 @@ export const getCategorizedProducts = async (productCategories, allProducts) => 
     const catDoc = await getDoc(catRef);
 
     const categoryData = await catDoc.data();
-    return { ...item, categoryName: categoryData?.name };
+    return { ...item, categoryName: categoryData?.name, position: categoryData?.position };
   });
 
-  return await Promise.all(data).then((res) => res);
+  return await Promise.all(data).then((res) => res.sort((a, b) => a.position - b.position));
+};
+
+// Get All Restaurants
+export const getAllRestaurants = async (setRestaurants) => {
+  const restaurantDocs = await getDocs(collection(db, 'restaurants'));
+  const data = restaurantDocs.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
+  setRestaurants(data);
 };
 
 // Get Restaurant by Short URL
@@ -59,7 +72,9 @@ export const getProducts = async (
   );
   setLoading(true);
   const productDocs = await getDocs(docs);
-  const allProducts = productDocs?.docs?.map((docum) => ({ id: docum.id, ...docum.data() }));
+  const allProducts = sortProductsByPosition(
+    productDocs?.docs?.map((docum) => ({ id: docum.id, ...docum.data() })),
+  );
   if (allProducts?.length) {
     const allCategories = allProducts?.map((item) => item.categoryId);
 
@@ -82,7 +97,7 @@ export const getAllSubCategories = async (selectedMenu, setCategories, restauran
   const docs = query(collection(db, 'categories'), where('restaurantId', '==', restaurantId));
   const cats = await getDocs(docs);
   const data = cats?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
-  setCategories(data);
+  setCategories(data?.sort((a, b) => a.position - b.position));
   // setLoadData(true);
 };
 
@@ -105,7 +120,9 @@ export const getProductsByMenu = async (selectedMenu, setLoading, setProducts, s
   );
   const productsData = await getDocs(productQuery);
 
-  const allProducts = productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
+  const allProducts = sortProductsByPosition(
+    productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() })),
+  );
   if (allProducts?.length > 0) {
     const allCategories = allProducts?.map((item) => item.categoryId);
     const uniqueCategories = [...new Set(allCategories)];
@@ -137,7 +154,9 @@ export const getProductsByCategory = async (
     where('categoryId', '==', selectedCategory?.id),
   );
   const productsData = await getDocs(productQuery);
-  const allProducts = productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
+  const allProducts = sortProductsByPosition(
+    productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() })),
+  );
 
   const data = [
     {
@@ -170,10 +189,12 @@ export const getSearchedProducts = async (
       where('restaurantId', '==', restaurantId),
     );
     const productsData = await getDocs(productQuery);
-    let allProducts = productsData?.docs?.map((docum) => ({
-      id: docum?.id,
-      ...docum.data(),
-    }));
+    let allProducts = sortProductsByPosition(
+      productsData?.docs?.map((docum) => ({
+        id: docum?.id,
+        ...docum.data(),
+      })),
+    );
 
     allProducts = allProducts.filter(
       (a) =>

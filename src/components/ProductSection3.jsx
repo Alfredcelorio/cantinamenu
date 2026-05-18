@@ -9,7 +9,10 @@ function ProductSection3({ products, setOpenDetail, setSelectedProduct }) {
 
   const handleSelectProduct = (id) => {
     const obj = {
-      products: products?.products,
+      products: products?.products?.map((item) => ({
+        ...item,
+        categoryName: products?.categoryName,
+      })),
       selectedId: id,
     };
     setSelectedProduct(obj);

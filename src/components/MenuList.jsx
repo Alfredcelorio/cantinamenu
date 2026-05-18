@@ -1,6 +1,5 @@
 /* eslint-disable object-curly-newline */
 import React from 'react';
-import Cross from '../assets/icons/close.png';
 
 function MenuList({ menus, setSelectedMenu, setOpenList, setSelectedCategory }) {
   const handleMenu = (menu) => {
@@ -10,10 +9,10 @@ function MenuList({ menus, setSelectedMenu, setOpenList, setSelectedCategory }) 
 
   return (
     <div className="popup">
-      <div className="popup_select">Select Type</div>
       <div className="popup_list">
         {menus?.map((item) => (
           <div
+            key={item.id || item.name}
             role="presentation"
             onClick={() => {
               handleMenu(item);
@@ -25,9 +24,6 @@ function MenuList({ menus, setSelectedMenu, setOpenList, setSelectedCategory }) 
           </div>
         ))}
       </div>
-      <button onClick={() => setOpenList(false)} className="popup_btn" type="submit">
-        <img className="popup_btn_icon" src={Cross} alt="close" />
-      </button>
     </div>
   );
 }
