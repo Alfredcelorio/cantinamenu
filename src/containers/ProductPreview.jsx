@@ -1,23 +1,28 @@
 /* eslint-disable object-curly-newline */
 /* eslint-disable no-unused-expressions */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ProductDetailCard from '../components/ProductDetailCard';
 import ProductPreviewHeader from '../components/ProductPreviewHeader';
+import { filterAvailableProducts } from '../utils/productAvailability';
 
 function ProductPreview({ setOpenDetail, selectedProduct, setSelectedProduct, media }) {
   const ref = useRef(null);
   const productRef = useRef(null);
-  const categoryName = selectedProduct?.products?.[0]?.categoryName;
+  const availableProducts = useMemo(
+    () => filterAvailableProducts(selectedProduct?.products || []),
+    [selectedProduct?.products],
+  );
+  const categoryName = availableProducts?.[0]?.categoryName;
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const { products, selectedId } = selectedProduct;
+    const { selectedId } = selectedProduct;
     if (productRef) {
-      const findIndex = products?.findIndex((item) => item?.id === selectedId);
-      if (findIndex !== 0) {
+      const findIndex = availableProducts?.findIndex((item) => item?.id === selectedId);
+      if (findIndex > 0) {
         const prevPosition = productRef?.current?.childNodes[findIndex]?.clientWidth;
         const prevElementWidth = prevPosition + 160;
         const elementPosition = productRef?.current?.childNodes[findIndex].offsetLeft;
@@ -27,7 +32,7 @@ function ProductPreview({ setOpenDetail, selectedProduct, setSelectedProduct, me
         });
       }
     }
-  }, [selectedProduct, media]);
+  }, [availableProducts, selectedProduct, media]);
 
   return (
     <div ref={ref} className="product_preview">
@@ -59,13 +64,13 @@ function ProductPreview({ setOpenDetail, selectedProduct, setSelectedProduct, me
       </button>
       <div
         style={{
-          justifyContent: `${selectedProduct?.products?.length > 1 ? 'flex-start' : 'center'}`,
+          justifyContent: `${availableProducts?.length > 1 ? 'flex-start' : 'center'}`,
         }}
         id="product_preview_wrapper"
         className="product_preview_wrapper"
         ref={productRef}
       >
-        {selectedProduct?.products?.map((product) => (
+        {availableProducts?.map((product) => (
           <ProductDetailCard
             media={media}
             active={product?.id === selectedProduct?.selectedId}

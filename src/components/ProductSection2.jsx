@@ -5,9 +5,11 @@ import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useNavigate } from 'react-router-dom';
 import ProductSectionHoc from '../hoc/ProductSectionHoc';
+import { filterAvailableProducts } from '../utils/productAvailability';
 
 function ProductSection2({ products, setOpenDetail, setSelectedProduct, section }) {
   const [loaded, setLoaded] = useState(false);
+  const availableProducts = filterAvailableProducts(products?.products || []);
 
   const navigate = useNavigate();
 
@@ -19,7 +21,7 @@ function ProductSection2({ products, setOpenDetail, setSelectedProduct, section 
 
   const handleSelectProduct = (id) => {
     const obj = {
-      products: products?.products?.map((item) => ({
+      products: availableProducts?.map((item) => ({
         ...item,
         categoryName: products?.categoryName,
       })),
@@ -33,11 +35,11 @@ function ProductSection2({ products, setOpenDetail, setSelectedProduct, section 
   return (
     <ProductSectionHoc
       section={section}
-      productsLength={products?.products?.length}
+      productsLength={availableProducts?.length}
       sectionTitle={products?.categoryName}
     >
       <div className="product_section_2">
-        {products?.products?.map((item) => (
+        {availableProducts?.map((item) => (
           <div
             role="presentation"
             key={item?.id}

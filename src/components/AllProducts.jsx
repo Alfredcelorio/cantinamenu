@@ -9,6 +9,7 @@ import ProductSection2 from './ProductSection2';
 // import Wine5 from '../assets/images/products/wine5.jpg';
 // import Wine2 from '../assets/images/products/wine2.jpg';
 import ProductMobile from './ProductMobile';
+import { filterAvailableProductGroups } from '../utils/productAvailability';
 
 // const recommendedProducts = [
 //   {
@@ -48,6 +49,7 @@ function AllProducts({
   products, setOpenDetail, setSelectedProduct, media, loadData,
 }) {
   const [mobileView, setMobileView] = useState(false);
+  const availableProducts = filterAvailableProductGroups(products);
 
   useEffect(() => {
     setMobileView(media);
@@ -65,19 +67,19 @@ function AllProducts({
       </div> */}
       {
         // eslint-disable-next-line consistent-return
-        !products?.length && loadData ? (
+        !availableProducts?.length && loadData ? (
           <div className="no_data">(0) Results </div>
         ) : mobileView ? (
-          products?.map((item) => (
+          availableProducts?.map((item) => (
             <ProductMobile
               setOpenDetail={setOpenDetail}
               setSelectedProduct={setSelectedProduct}
-              key={products?.title}
+              key={item?.categoryId || item?.categoryName}
               products={item}
             />
           ))
         ) : (
-          products?.map((item, ind) => (
+          availableProducts?.map((item, ind) => (
             <ProductSection2
               section={2}
               setOpenDetail={setOpenDetail}

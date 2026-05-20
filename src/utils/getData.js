@@ -7,6 +7,7 @@
 /* eslint-disable no-return-await */
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore/lite';
 import { db } from './firebase';
+import { filterAvailableProducts } from './productAvailability';
 
 const sortProductsByPosition = (products = []) => [...products].sort(
     (a, b) => (a?.position ?? Number.MAX_SAFE_INTEGER) - (b?.position ?? Number.MAX_SAFE_INTEGER),
@@ -30,11 +31,24 @@ export const getCategorizedProducts = async (productCategories, allProducts) => 
     const catRef = doc(db, 'categories', item.categoryId);
     const catDoc = await getDoc(catRef);
 
+    if (!catDoc.exists()) {
+      return null;
+    }
+
     const categoryData = await catDoc.data();
+
+    if (categoryData?.enabled === false) {
+      return null;
+    }
+
     return { ...item, categoryName: categoryData?.name, position: categoryData?.position };
   });
 
-  return await Promise.all(data).then((res) => res.sort((a, b) => a.position - b.position));
+  return await Promise.all(data).then((res) => res
+      .filter((item) => item?.products?.length > 0)
+      .sort(
+        (a, b) => (a?.position ?? Number.MAX_SAFE_INTEGER) - (b?.position ?? Number.MAX_SAFE_INTEGER),
+      ));
 };
 
 // Get All Restaurants
@@ -73,7 +87,7 @@ export const getProducts = async (
   setLoading(true);
   const productDocs = await getDocs(docs);
   const allProducts = sortProductsByPosition(
-    productDocs?.docs?.map((docum) => ({ id: docum.id, ...docum.data() })),
+    filterAvailableProducts(productDocs?.docs?.map((docum) => ({ id: docum.id, ...docum.data() }))),
   );
   if (allProducts?.length) {
     const allCategories = allProducts?.map((item) => item.categoryId);
@@ -94,7 +108,11 @@ export const getProducts = async (
 };
 
 export const getAllSubCategories = async (selectedMenu, setCategories, restaurantId) => {
-  const docs = query(collection(db, 'categories'), where('restaurantId', '==', restaurantId));
+  const docs = query(
+    collection(db, 'categories'),
+    where('restaurantId', '==', restaurantId),
+    where('enabled', '==', true),
+  );
   const cats = await getDocs(docs);
   const data = cats?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
   setCategories(data?.sort((a, b) => a.position - b.position));
@@ -121,7 +139,9 @@ export const getProductsByMenu = async (selectedMenu, setLoading, setProducts, s
   const productsData = await getDocs(productQuery);
 
   const allProducts = sortProductsByPosition(
-    productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() })),
+    filterAvailableProducts(
+      productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() })),
+    ),
   );
   if (allProducts?.length > 0) {
     const allCategories = allProducts?.map((item) => item.categoryId);
@@ -155,7 +175,9 @@ export const getProductsByCategory = async (
   );
   const productsData = await getDocs(productQuery);
   const allProducts = sortProductsByPosition(
-    productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() })),
+    filterAvailableProducts(
+      productsData?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() })),
+    ),
   );
 
   const data = [
@@ -190,10 +212,12 @@ export const getSearchedProducts = async (
     );
     const productsData = await getDocs(productQuery);
     let allProducts = sortProductsByPosition(
-      productsData?.docs?.map((docum) => ({
-        id: docum?.id,
-        ...docum.data(),
-      })),
+      filterAvailableProducts(
+        productsData?.docs?.map((docum) => ({
+          id: docum?.id,
+          ...docum.data(),
+        })),
+      ),
     );
 
     allProducts = allProducts.filter(

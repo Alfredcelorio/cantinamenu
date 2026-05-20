@@ -5,9 +5,11 @@ import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useNavigate } from 'react-router-dom';
 import ProductSectionHoc from '../hoc/ProductSectionHoc';
+import { filterAvailableProducts } from '../utils/productAvailability';
 
 function ProductMobile({ products, setOpenDetail, setSelectedProduct, media }) {
   const [loaded, setLoaded] = useState(false);
+  const availableProducts = filterAvailableProducts(products?.products || []);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +20,7 @@ function ProductMobile({ products, setOpenDetail, setSelectedProduct, media }) {
 
   const handleSelectProduct = (id) => {
     const obj = {
-      products: products?.products?.map((item) => ({
+      products: availableProducts?.map((item) => ({
         ...item,
         categoryName: products?.categoryName,
       })),
@@ -31,11 +33,11 @@ function ProductMobile({ products, setOpenDetail, setSelectedProduct, media }) {
 
   return (
     <ProductSectionHoc
-      productsLength={products?.products?.length}
+      productsLength={availableProducts?.length}
       sectionTitle={products?.categoryName}
     >
       <div className="product_section_mobile">
-        {products?.products?.map((item) => (
+        {availableProducts?.map((item) => (
           <div
             role="presentation"
             className="product_card_mobile"
