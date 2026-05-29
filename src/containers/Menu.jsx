@@ -158,6 +158,7 @@ function Menu() {
           <div className="menu_content">
             <AllProducts
               products={products}
+              selectedMenu={selectedMenu}
               media={media}
               loadData={loadData}
               setSelectedProduct={setSelectedProduct}

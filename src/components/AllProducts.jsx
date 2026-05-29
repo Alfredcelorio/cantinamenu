@@ -3,6 +3,7 @@
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect } from 'react';
 import ProductSection2 from './ProductSection2';
+import MenuProductList from './MenuProductList';
 // import Product from './Product';
 // import HeaderImage from '../assets/images/header.jpg';
 // import Wine3 from '../assets/images/products/wine3.jpg';
@@ -46,10 +47,16 @@ import { filterAvailableProductGroups } from '../utils/productAvailability';
 // ];
 
 function AllProducts({
-  products, setOpenDetail, setSelectedProduct, media, loadData,
+  products,
+  selectedMenu,
+  setOpenDetail,
+  setSelectedProduct,
+  media,
+  loadData,
 }) {
   const [mobileView, setMobileView] = useState(false);
   const availableProducts = filterAvailableProductGroups(products);
+  const showMenuProductList = selectedMenu?.name === 'Happy Hour from 4 PM to 7 PM';
 
   useEffect(() => {
     setMobileView(media);
@@ -69,6 +76,8 @@ function AllProducts({
         // eslint-disable-next-line consistent-return
         !availableProducts?.length && loadData ? (
           <div className="no_data">(0) Results </div>
+        ) : showMenuProductList ? (
+          <MenuProductList products={products} />
         ) : mobileView ? (
           availableProducts?.map((item) => (
             <ProductMobile

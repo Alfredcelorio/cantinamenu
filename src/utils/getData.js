@@ -9,6 +9,10 @@ import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firesto
 import { db } from './firebase';
 import { filterAvailableProducts } from './productAvailability';
 
+const sortByPosition = (items = []) => [...items].sort(
+    (a, b) => (a?.position ?? Number.MAX_SAFE_INTEGER) - (b?.position ?? Number.MAX_SAFE_INTEGER),
+  );
+
 const sortProductsByPosition = (products = []) => [...products].sort(
     (a, b) => (a?.position ?? Number.MAX_SAFE_INTEGER) - (b?.position ?? Number.MAX_SAFE_INTEGER),
   );
@@ -115,7 +119,7 @@ export const getAllSubCategories = async (selectedMenu, setCategories, restauran
   );
   const cats = await getDocs(docs);
   const data = cats?.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
-  setCategories(data?.sort((a, b) => a.position - b.position));
+  setCategories(sortByPosition(data));
   // setLoadData(true);
 };
 
@@ -123,7 +127,7 @@ export const getAllMenus = async (setMenus, restaurantId) => {
   const docs = query(collection(db, 'menus'), where('restaurantId', '==', restaurantId));
   const menuDocs = await getDocs(docs);
   const data = menuDocs.docs?.map((docum) => ({ id: docum?.id, ...docum.data() }));
-  setMenus(data);
+  setMenus(sortByPosition(data).filter((menu) => menu?.status !== false));
   // setLoadData(true);
 };
 
