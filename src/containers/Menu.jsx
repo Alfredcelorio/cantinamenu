@@ -22,7 +22,7 @@ import {
   getRestaurantByUrl,
 } from '../utils/getData';
 
-const SPLASH_IDLE_TIME = 3 * 60 * 1000;
+const SPLASH_IDLE_TIME = 45 * 1000;
 
 function Menu() {
   const [menus, setMenus] = useState([]);
