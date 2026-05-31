@@ -90,6 +90,45 @@
   font-weight: bold;
 }
 
+/*  Splash Screen  */
+.splash_screen {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: #000;
+  overflow: hidden;
+}
+
+.splash_video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.splash_start_button {
+  position: absolute;
+  right: 4rem;
+  bottom: 4rem;
+  min-width: 16rem;
+  padding: 1.3rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
 /*  Mneu Popup  */
 
 @keyframes popup_list_anim {
@@ -160,5 +199,13 @@
   .menu_content {
     padding-left: 6%;
     padding-right: 6%;
+  }
+
+  .splash_start_button {
+    right: 2rem;
+    bottom: 2rem;
+    min-width: 13rem;
+    padding: 1rem 1.4rem;
+    font-size: 1.3rem;
   }
 }

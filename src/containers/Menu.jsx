@@ -2,7 +2,9 @@
 /* eslint-disable no-useless-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-return-await */
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
@@ -20,6 +22,8 @@ import {
   getRestaurantByUrl,
 } from '../utils/getData';
 
+const SPLASH_IDLE_TIME = 3 * 60 * 1000;
+
 function Menu() {
   const [menus, setMenus] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -35,6 +39,7 @@ function Menu() {
 
   const [stopScroll, setStopScroll] = useState(false);
   const [openList, setOpenList] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
   const [openDetail, setOpenDetail] = useState(false);
   const setLoading = () => {};
   const [loadData, setLoadData] = useState(false);
@@ -42,10 +47,34 @@ function Menu() {
   const navigate = useNavigate();
 
   const ref = useRef(null);
+  const idleTimer = useRef(null);
   const media = window.matchMedia('(max-width: 500px)').matches;
 
   const params = useParams();
   const location = useLocation();
+  const splashVideo = restaurant?.splashVideo || '/splash.mp4';
+  const shouldShowSplash = restaurant?.id && showSplash;
+
+  const resetToSplash = useCallback(() => {
+    setShowSplash(true);
+    setOpenList(true);
+    setOpenDetail(false);
+    setSelectedCategory('');
+    setSelectedMenu();
+    setSelectedProduct({
+      products: [],
+      selectedId: '',
+    });
+
+    if (location?.search) {
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location?.pathname, location?.search, navigate]);
+
+  const startMenu = () => {
+    setShowSplash(false);
+    setOpenList(true);
+  };
 
   useEffect(() => {
     if (selectedMenu?.name) {
@@ -100,6 +129,29 @@ function Menu() {
     }
   }, [restaurant]);
 
+  useEffect(() => {
+    if (!restaurant?.id || showSplash) return undefined;
+
+    const resetIdleTimer = () => {
+      window.clearTimeout(idleTimer.current);
+      idleTimer.current = window.setTimeout(resetToSplash, SPLASH_IDLE_TIME);
+    };
+
+    const activityEvents = ['click', 'touchstart', 'keydown', 'scroll'];
+
+    resetIdleTimer();
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, resetIdleTimer, { passive: true });
+    });
+
+    return () => {
+      window.clearTimeout(idleTimer.current);
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, resetIdleTimer);
+      });
+    };
+  }, [restaurant?.id, resetToSplash, showSplash]);
+
   const onScroll = () => {
     const { scrollTop } = document.getElementById('menu');
 
@@ -144,6 +196,25 @@ function Menu() {
             setOpenList={setOpenList}
             setLoading={setLoading}
           />
+          {shouldShowSplash && (
+            <button
+              type="button"
+              className="splash_screen"
+              onClick={startMenu}
+              aria-label="Continue to menu selection"
+            >
+              <video
+                className="splash_video"
+                src={splashVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                onError={() => setShowSplash(false)}
+              />
+              <span className="splash_start_button">Click here to start</span>
+            </button>
+          )}
           {openList && !location?.search && (
             <div className="popup_container">
               <MenuList
